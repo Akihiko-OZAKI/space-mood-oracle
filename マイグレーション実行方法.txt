@@ -1,0 +1,74 @@
+================================================================================
+マイグレーション実行方法
+================================================================================
+
+【簡単な方法】手動でSQLファイルを実行
+
+1. マイグレーションファイルを開く:
+   drizzle/0003_trend_analysis_tables.sql
+
+2. ファイルの内容をコピー
+
+3. データベース管理ツールで実行:
+   - phpMyAdmin: SQLタブ → ペースト → 実行
+   - MySQL Workbench: クエリエディタ → ペースト → 実行
+   - コマンドライン: mysql -u user -p database < drizzle/0003_trend_analysis_tables.sql
+
+【実行するSQL内容】
+
+CREATE TABLE `google_trend_data` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`date` varchar(10) NOT NULL,
+	`keyword` varchar(100) NOT NULL,
+	`score` int,
+	`region` varchar(10) DEFAULT 'JP',
+	`category` varchar(50),
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `google_trend_data_id` PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `twitter_trend_data` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`date` varchar(10) NOT NULL,
+	`keyword` varchar(100) NOT NULL,
+	`tweet_volume` int,
+	`sentiment_score` varchar(20),
+	`region` varchar(10) DEFAULT 'JP',
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	CONSTRAINT `twitter_trend_data_id` PRIMARY KEY(`id`)
+);
+
+CREATE TABLE `daily_mood_judgment` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`date` varchar(10) NOT NULL,
+	`judgment` varchar(20) NOT NULL,
+	`score` varchar(20) NOT NULL,
+	`google_score` varchar(20),
+	`twitter_score` varchar(20),
+	`space_weather_score` varchar(20),
+	`confidence` varchar(20),
+	`createdAt` timestamp NOT NULL DEFAULT (now()),
+	`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `daily_mood_judgment_id` PRIMARY KEY(`id`),
+	CONSTRAINT `daily_mood_judgment_date_unique` UNIQUE(`date`)
+);
+
+================================================================================
+実行後の確認方法
+================================================================================
+
+SQLを実行して、以下のコマンドで確認:
+
+SHOW TABLES LIKE '%trend%';
+SHOW TABLES LIKE '%mood%';
+
+または、個別に確認:
+
+DESCRIBE google_trend_data;
+DESCRIBE twitter_trend_data;
+DESCRIBE daily_mood_judgment;
+
+================================================================================
+詳細な手順は「マイグレーション手動実行手順.md」を参照してください
+================================================================================
+

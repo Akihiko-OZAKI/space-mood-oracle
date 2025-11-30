@@ -1,0 +1,8 @@
+{
+  "query": "SELECT date, kpIndexMax, xClassFlareCount, mClassFlareCount FROM space_weather_data ORDER BY date DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 39ptB35ueW9ufMt.root --database R7LmDs9wZFC76J26rkBhKz --execute SELECT date, kpIndexMax, xClassFlareCount, mClassFlareCount FROM space_weather_data ORDER BY date DESC LIMIT 5;",
+  "returncode": 1,
+  "logs": [
+    "ERROR 1054 (42S22) at line 1: Unknown column 'kpindexmax' in 'field list'"
+  ]
+}

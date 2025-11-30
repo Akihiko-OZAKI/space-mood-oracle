@@ -1,0 +1,65 @@
+{
+  "query": "SELECT * FROM space_weather_data ORDER BY date DESC LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 39ptB35ueW9ufMt.root --database R7LmDs9wZFC76J26rkBhKz --execute SELECT * FROM space_weather_data ORDER BY date DESC LIMIT 5;",
+  "rows": [
+    {
+      "id": "181",
+      "date": "2025-11-28",
+      "kp_index_max": "3.67",
+      "x_class_flare_count": "0",
+      "m_class_flare_count": "0",
+      "solar_wind_speed": "NULL",
+      "proton_flux": "NULL",
+      "createdAt": "2025-11-28 06:56:52",
+      "updatedAt": "2025-11-28 07:24:26"
+    },
+    {
+      "id": "90",
+      "date": "2025-11-27",
+      "kp_index_max": "0.00",
+      "x_class_flare_count": "0",
+      "m_class_flare_count": "0",
+      "solar_wind_speed": "NULL",
+      "proton_flux": "NULL",
+      "createdAt": "2025-11-28 06:55:22",
+      "updatedAt": "2025-11-28 07:24:25"
+    },
+    {
+      "id": "89",
+      "date": "2025-11-26",
+      "kp_index_max": "0.00",
+      "x_class_flare_count": "0",
+      "m_class_flare_count": "0",
+      "solar_wind_speed": "NULL",
+      "proton_flux": "NULL",
+      "createdAt": "2025-11-28 06:55:22",
+      "updatedAt": "2025-11-28 07:24:25"
+    },
+    {
+      "id": "88",
+      "date": "2025-11-25",
+      "kp_index_max": "0.00",
+      "x_class_flare_count": "0",
+      "m_class_flare_count": "0",
+      "solar_wind_speed": "NULL",
+      "proton_flux": "NULL",
+      "createdAt": "2025-11-28 06:55:22",
+      "updatedAt": "2025-11-28 07:24:24"
+    },
+    {
+      "id": "87",
+      "date": "2025-11-24",
+      "kp_index_max": "0.00",
+      "x_class_flare_count": "0",
+      "m_class_flare_count": "0",
+      "solar_wind_speed": "NULL",
+      "proton_flux": "NULL",
+      "createdAt": "2025-11-28 06:55:22",
+      "updatedAt": "2025-11-28 07:24:24"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tdate\tkp_index_max\tx_class_flare_count\tm_class_flare_count\tsolar_wind_speed\tproton_flux\tcreatedAt\tupdatedAt\n181\t2025-11-28\t3.67\t0\t0\tNULL\tNULL\t2025-11-28 06:56:52\t2025-11-28 07:24:26\n90\t2025-11-27\t0.00\t0\t0\tNULL\tNULL\t2025-11-28 06:55:22\t2025-11-28 07:24:25\n89\t2025-11-26\t0.00\t0\t0\tNULL\tNULL\t2025-11-28 06:55:22\t2025-11-28 07:24:25\n88\t2025-11-25\t0.00\t0\t0\tNULL\tNULL\t2025-11-28 06:55:22\t2025-11-28 07:24:24\n87\t2025-11-24\t0.00\t0\t0\tNULL\tNULL\t2025-11-28 06:55:22\t2025-11-28 07:24:24\n",
+  "stderr": "",
+  "execution_time_ms": 1601
+}

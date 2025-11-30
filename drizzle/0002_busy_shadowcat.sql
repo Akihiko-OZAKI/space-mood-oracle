@@ -1,0 +1,1 @@
+ALTER TABLE `space_weather_data` ADD `solar_radiation_scale` int DEFAULT 0 NOT NULL;
