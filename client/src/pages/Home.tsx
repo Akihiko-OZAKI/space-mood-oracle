@@ -37,8 +37,14 @@ export default function Home() {
   };
 
   const handleFetchRealData = async () => {
-    await fetchRealDataMutation.mutateAsync();
-    window.location.reload();
+    try {
+      const result = await fetchRealDataMutation.mutateAsync();
+      toast.success(`実データ取得完了: ${result.count}件のデータを取得しました`);
+      window.location.reload();
+    } catch (error) {
+      console.error('実データ取得エラー:', error);
+      toast.error(`実データ取得に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
+    }
   };
 
   const getMoodEmoji = (score?: string) => {

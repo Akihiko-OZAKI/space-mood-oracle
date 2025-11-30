@@ -77,7 +77,7 @@ export const appRouter = router({
         return getSpaceWeatherDataByDate(input.date);
       }),
     
-    fetchLatest: protectedProcedure
+    fetchLatest: publicProcedure
       .mutation(async () => {
         const { fetchRealSpaceWeatherData, saveRealDataToDatabase } = await import('./realSpaceWeather');
         
