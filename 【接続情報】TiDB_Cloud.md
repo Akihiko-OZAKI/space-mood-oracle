@@ -3,9 +3,9 @@
 ## 📋 取得した接続情報
 
 ```
-Host: gateway01.ap-northeast-1.prod.aws.tidbcloud.com
+Host: YOUR_HOST.tidbcloud.com
 Port: 4000
-User: 2iZ5PoqMuT8TqCD.root
+User: YOUR_USERNAME
 Database: fortune500 → space_mood_oracle に変更
 Password: 設定が必要
 ```
@@ -42,13 +42,13 @@ Password: 設定が必要
 ### パスワード設定後
 
 ```
-mysql://2iZ5PoqMuT8TqCD.root:yourpassword@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
+mysql://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
 ```
 
 ### 個別パラメータ
 
 ```env
-DATABASE_URL=mysql://2iZ5PoqMuT8TqCD.root:yourpassword@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
+DATABASE_URL=mysql://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
 ```
 
 ---
@@ -58,7 +58,7 @@ DATABASE_URL=mysql://2iZ5PoqMuT8TqCD.root:yourpassword@gateway01.ap-northeast-1.
 パスワードを `mypassword123` に設定した場合:
 
 ```env
-DATABASE_URL=mysql://2iZ5PoqMuT8TqCD.root:mypassword123@gateway01.ap-northeast-1.prod.aws.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
+DATABASE_URL=mysql://YOUR_USERNAME:YOUR_PASSWORD@YOUR_HOST.tidbcloud.com:4000/space_mood_oracle?ssl-mode=REQUIRED
 ```
 
 ---
@@ -73,4 +73,5 @@ DATABASE_URL=mysql://2iZ5PoqMuT8TqCD.root:mypassword123@gateway01.ap-northeast-1
 ---
 
 **パスワードを設定して、接続文字列を完成させましょう！** 🔐
+
 

@@ -35,3 +35,4 @@ CREATE TABLE `daily_mood_judgment` (
 	CONSTRAINT `daily_mood_judgment_date_unique` UNIQUE(`date`)
 );
 
+

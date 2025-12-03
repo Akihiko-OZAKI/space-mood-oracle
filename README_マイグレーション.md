@@ -81,3 +81,4 @@ DESCRIBE daily_mood_judgment;
 
 **わからないことがあれば、まずは方法1（手動実行）をお試しください！** 🎉
 
+

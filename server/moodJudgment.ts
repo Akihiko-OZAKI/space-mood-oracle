@@ -162,3 +162,4 @@ export function aggregateTwitterTrendSentiment(
   return Math.max(-1.0, Math.min(1.0, score));
 }
 
+

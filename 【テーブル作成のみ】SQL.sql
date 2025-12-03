@@ -65,3 +65,4 @@ CREATE TABLE IF NOT EXISTS `daily_mood_judgment` (
 --
 -- ============================================
 
+

@@ -206,3 +206,4 @@ console.log(result.judgment);
 
 以上で、Twitter/Googleトレンド統合分析のPoC実装が完了しました！🎉
 
+
