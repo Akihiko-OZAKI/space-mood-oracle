@@ -1,7 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Sparkles, Moon, Sun, Activity, TrendingUp, Calendar, Database, RefreshCw } from "lucide-react";
+import { Sparkles, Moon, Sun, Activity, TrendingUp, Calendar, Database, RefreshCw, Brain } from "lucide-react";
 import { useState } from "react";
 import { SentimentChart } from "@/components/SentimentChart";
 import { TweetUpload } from "@/components/TweetUpload";
@@ -20,6 +20,7 @@ export default function Home() {
     endDate: undefined,
   });
 
+  const trainPredictionMutation = trpc.predictions.trainFromHistory.useMutation();
   const generateMockDataMutation = trpc.spaceWeather.generateMockData.useMutation();
   const fetchRealDataMutation = trpc.spaceWeather.fetchLatest.useMutation();
 
@@ -44,6 +45,26 @@ export default function Home() {
     } catch (error) {
       console.error('実データ取得エラー:', error);
       toast.error(`実データ取得に失敗しました: ${error instanceof Error ? error.message : '不明なエラー'}`);
+    }
+  };
+
+  const handleTrainPrediction = async () => {
+    try {
+      const result = await trainPredictionMutation.mutateAsync({ days: 90 });
+      if (!result.success) {
+        if (result.reason === "not-enough-training-data") {
+          toast.error(`学習データが不足しています（${result.trainingSize}日分）。まずは過去の日別ムードCSVをアップロードしてください。`);
+        } else if (result.reason === "no-space-weather-today") {
+          toast.error("今日の宇宙天気データがありません。先に「実データ取得（NOAA）」を実行してください。");
+        } else {
+          toast.error("推論モデルの学習に失敗しました。");
+        }
+        return;
+      }
+      toast.success("宇宙モデルを更新しました（過去90日分のデータで学習）");
+    } catch (error) {
+      console.error("Prediction training error:", error);
+      toast.error("推論モデルの更新に失敗しました。");
     }
   };
 
@@ -99,12 +120,12 @@ export default function Home() {
                 <h3 className="text-sm font-medium text-white">データ管理</h3>
                 <p className="text-xs text-muted-foreground">
                   {spaceWeatherData && spaceWeatherData.length > 0 
-                    ? `${spaceWeatherData.length}日分のデータ` 
-                    : 'データなし'}
+                    ? `${spaceWeatherData.length}日分の宇宙天気データ` 
+                    : '宇宙天気データなし'}
                 </p>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button 
                 onClick={handleFetchRealData} 
                 disabled={fetchRealDataMutation.isPending}
@@ -121,6 +142,16 @@ export default function Home() {
                 variant="outline"
               >
                 {generateMockDataMutation.isPending ? '生成中...' : 'サンプル生成'}
+              </Button>
+              <Button
+                onClick={handleTrainPrediction}
+                disabled={trainPredictionMutation.isPending}
+                size="sm"
+                variant="outline"
+                className="gap-1"
+              >
+                <Brain className="h-4 w-4" />
+                {trainPredictionMutation.isPending ? "学習中..." : "宇宙モデル更新"}
               </Button>
             </div>
           </div>
@@ -236,6 +267,26 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* Prediction based on space weather only */}
+                {todayFortune.prediction && (
+                  <div className="p-4 rounded-lg bg-black/40 border border-primary/20">
+                    <div className="flex items-start gap-3">
+                      <Brain className="h-5 w-5 text-primary mt-1" />
+                      <div className="space-y-1 text-sm">
+                        <p className="font-semibold text-base">
+                          あなたの今日の不調は、宇宙のせいだ。
+                        </p>
+                        <p className="text-muted-foreground">
+                          過去の集合意識データと宇宙天気の相関から、「今日の集合意識」を宇宙だけの情報で推定した結果です。
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          推定スコア: {Number(todayFortune.prediction.predictedScore ?? 0).toFixed(3)} （信頼度 {Number(todayFortune.prediction.confidence ?? 0).toFixed(2)}）
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <div className="text-center py-8 space-y-4">

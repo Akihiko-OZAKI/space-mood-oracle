@@ -148,9 +148,110 @@ export const appRouter = router({
         const { getLatestPredictionByDate } = await import('./db');
         return getLatestPredictionByDate(input.date);
       }),
+
+    // Train simple correlation model from historical data and
+    // predict today's sentiment based only on space weather.
+    trainFromHistory: publicProcedure
+      .input(z.object({
+        days: z.number().min(7).max(365).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const days = input.days ?? 90;
+
+        const today = new Date();
+        const endDate = today.toISOString().split("T")[0];
+        const start = new Date(today);
+        start.setDate(start.getDate() - (days - 1));
+        const startDate = start.toISOString().split("T")[0];
+
+        const {
+          getDailySentimentScores,
+          getSpaceWeatherData,
+          getSpaceWeatherDataByDate,
+          insertPrediction,
+        } = await import("./db");
+        const { predictSentiment } = await import("./prediction");
+
+        // Load historical data
+        const [sentiments, spaceWeather] = await Promise.all([
+          getDailySentimentScores(startDate, endDate),
+          getSpaceWeatherData(startDate, endDate),
+        ]);
+
+        // Join by date
+        const spaceByDate = new Map<string, any>(
+          spaceWeather.map((sw: any) => [sw.date, sw]),
+        );
+
+        const trainingData = sentiments
+          .map((s: any) => {
+            const sw = spaceByDate.get(s.date);
+            if (!sw) return null;
+
+            const sentimentScore = parseFloat(s.score ?? "0");
+            const kpIndexMax = parseFloat(sw.kpIndexMax ?? "0");
+            const xClassFlareCount = sw.xClassFlareCount ?? 0;
+            const mClassFlareCount = sw.mClassFlareCount ?? 0;
+
+            if (Number.isNaN(sentimentScore) || Number.isNaN(kpIndexMax)) {
+              return null;
+            }
+
+            return {
+              date: s.date,
+              sentimentScore,
+              kpIndexMax,
+              xClassFlareCount,
+              mClassFlareCount,
+            };
+          })
+          .filter((x: any) => x !== null);
+
+        if (trainingData.length < 5) {
+          return {
+            success: false as const,
+            reason: "not-enough-training-data" as const,
+            trainingSize: trainingData.length,
+          };
+        }
+
+        // Today's space weather
+        const todaySpaceWeather =
+          await getSpaceWeatherDataByDate(endDate);
+
+        if (!todaySpaceWeather) {
+          return {
+            success: false as const,
+            reason: "no-space-weather-today" as const,
+            trainingSize: trainingData.length,
+          };
+        }
+
+        const spaceInput = {
+          kpIndexMax: parseFloat(todaySpaceWeather.kpIndexMax ?? "0"),
+          xClassFlareCount: todaySpaceWeather.xClassFlareCount ?? 0,
+          mClassFlareCount: todaySpaceWeather.mClassFlareCount ?? 0,
+        };
+
+        const prediction = predictSentiment(trainingData as any, spaceInput);
+
+        await insertPrediction({
+          date: endDate,
+          predictedScore: prediction.predictedScore.toFixed(6),
+          confidence: prediction.confidence.toFixed(6),
+          modelVersion: `simple-correlation-v1`,
+        });
+
+        return {
+          success: true as const,
+          trainingSize: trainingData.length,
+          prediction,
+        };
+      }),
   }),
 
-  tweetUpload: router({ uploadCSV: protectedProcedure
+  tweetUpload: router({
+    uploadCSV: publicProcedure
       .input(z.object({
         csvContent: z.string(),
       }))

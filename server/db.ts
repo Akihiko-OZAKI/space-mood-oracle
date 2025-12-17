@@ -1,5 +1,6 @@
 import { eq, desc, asc, and, gte, lte } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
+import mysql from "mysql2/promise";
 import { 
   InsertUser, 
   users,
@@ -24,15 +25,45 @@ let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
-    try {
-      _db = drizzle(process.env.DATABASE_URL);
-    } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
-      _db = null;
-    }
+  if (_db) return _db;
+
+  const urlStr = process.env.DATABASE_URL;
+  if (!urlStr) {
+    console.warn("[Database] DATABASE_URL is not set. Cannot create connection.");
+    return null;
   }
-  return _db;
+
+  try {
+    const url = new URL(urlStr);
+    const host = url.hostname;
+    const port = parseInt(url.port || "4000", 10);
+    const user = decodeURIComponent(url.username);
+    const password = decodeURIComponent(url.password);
+    const database = url.pathname.replace(/^\//, "") || undefined;
+
+    const safeInfo = `${url.protocol}//${host}:${port}/${database ?? ""}`;
+    console.log("[Database] Initializing MySQL pool with TLS to", safeInfo);
+
+    const pool = await mysql.createPool({
+      host,
+      port,
+      user,
+      password,
+      database,
+      ssl: {
+        minVersion: "TLSv1.2",
+        rejectUnauthorized: false, // Dev: allow TiDB Cloud certificate without local CA file
+      },
+    });
+
+    _db = drizzle(pool);
+    console.log("[Database] Connection object created successfully.");
+    return _db;
+  } catch (error) {
+    console.warn("[Database] Failed to connect:", error);
+    _db = null;
+    return null;
+  }
 }
 
 export async function upsertUser(user: InsertUser): Promise<void> {
