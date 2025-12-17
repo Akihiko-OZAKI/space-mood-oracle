@@ -2,7 +2,6 @@ import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
 import net from "net";
-import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -36,12 +35,29 @@ async function startServer() {
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   // CORS: allow Vercel frontend (and local dev) to call API
   const allowedOrigin = process.env.CORS_ORIGIN || "*";
-  app.use(
-    cors({
-      origin: allowedOrigin === "*" ? true : allowedOrigin,
-      credentials: true,
-    }),
-  );
+  app.use((req, res, next) => {
+    if (allowedOrigin === "*") {
+      res.header("Access-Control-Allow-Origin", "*");
+    } else {
+      res.header("Access-Control-Allow-Origin", allowedOrigin);
+      res.header("Vary", "Origin");
+    }
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET,POST,PUT,DELETE,OPTIONS",
+    );
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Requested-With",
+    );
+
+    if (req.method === "OPTIONS") {
+      return res.sendStatus(204);
+    }
+
+    next();
+  });
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   // tRPC API
