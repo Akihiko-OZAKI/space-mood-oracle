@@ -247,44 +247,51 @@ export async function saveRealDataToDatabase(data: ProcessedSpaceWeatherData[]) 
   
   const db = await getDb();
   if (!db) {
+    console.error('[SpaceWeather] Database not available in saveRealDataToDatabase');
     throw new Error('Database not available');
   }
 
-  for (const item of data) {
-    // Check if data already exists
-    const existing = await db
-      .select()
-      .from(spaceWeatherData)
-      .where(eq(spaceWeatherData.date, item.date))
-      .limit(1);
+  try {
+    for (const item of data) {
+      // Check if data already exists
+      const existing = await db
+        .select()
+        .from(spaceWeatherData)
+        .where(eq(spaceWeatherData.date, item.date))
+        .limit(1);
 
-    if (existing.length > 0) {
-      // Update existing record
-      await db
-        .update(spaceWeatherData)
-        .set({
+      if (existing.length > 0) {
+        // Update existing record
+        await db
+          .update(spaceWeatherData)
+          .set({
+            kpIndexMax: item.kpIndexMax.toFixed(2),
+            xClassFlareCount: item.xClassFlareCount,
+            mClassFlareCount: item.mClassFlareCount,
+            solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
+            protonFlux: item.protonFlux?.toFixed(2) || null,
+            solarRadiationScale: item.solarRadiationScale,
+            updatedAt: new Date(),
+          })
+          .where(eq(spaceWeatherData.date, item.date));
+      } else {
+        // Insert new record
+        await db.insert(spaceWeatherData).values({
+          date: item.date,
           kpIndexMax: item.kpIndexMax.toFixed(2),
           xClassFlareCount: item.xClassFlareCount,
           mClassFlareCount: item.mClassFlareCount,
           solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
           protonFlux: item.protonFlux?.toFixed(2) || null,
           solarRadiationScale: item.solarRadiationScale,
-          updatedAt: new Date(),
-        })
-        .where(eq(spaceWeatherData.date, item.date));
-    } else {
-      // Insert new record
-      await db.insert(spaceWeatherData).values({
-        date: item.date,
-        kpIndexMax: item.kpIndexMax.toFixed(2),
-        xClassFlareCount: item.xClassFlareCount,
-        mClassFlareCount: item.mClassFlareCount,
-        solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
-        protonFlux: item.protonFlux?.toFixed(2) || null,
-        solarRadiationScale: item.solarRadiationScale,
-      });
+        });
+      }
     }
-  }
 
-  console.log(`✅ Saved ${data.length} days of real space weather data to database`);
+    console.log(`✅ Saved ${data.length} days of real space weather data to database`);
+  } catch (error) {
+    console.error('[SpaceWeather] Failed to save real space weather data to database');
+    console.error(error);
+    throw error;
+  }
 }
