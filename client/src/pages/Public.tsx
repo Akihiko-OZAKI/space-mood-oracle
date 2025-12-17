@@ -231,7 +231,7 @@ export default function Public() {
                   </li>
                   <li>
                     <span className="font-medium text-foreground">高エネルギー陽子フラックス:</span>{" "}
-                    GOES衛星による積分陽子フラックス（>=10MeV）から日ごとの最大値を取得し、NOAA の Solar
+                    GOES衛星による積分陽子フラックス（&gt;=10MeV）から日ごとの最大値を取得し、NOAA の Solar
                     Radiation Storm Scale に従って S0〜S5 の「太陽放射嵐スケール（solarRadiationScale）」に変換しています。
                     値が大きいほど、宇宙線によるストレスや電子機器への影響が強い状態を表します。
                   </li>
