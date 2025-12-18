@@ -4,7 +4,7 @@ import { SentimentChart } from "@/components/SentimentChart";
 import { Sparkles, Sun, Activity, TrendingUp, Calendar } from "lucide-react";
 
 export default function Public() {
-  const { data: todayFortune, isLoading } = trpc.oracle.getTodayFortune.useQuery();
+  const { data: todayFortune, isLoading, error: fortuneError } = trpc.oracle.getTodayFortune.useQuery();
 
   const today = new Date();
   const endDate = today.toISOString().split("T")[0];
@@ -12,13 +12,13 @@ export default function Public() {
   start.setDate(start.getDate() - 29); // 過去30日分をグラフに表示
   const startDate = start.toISOString().split("T")[0];
 
-  const { data: sentimentScores, isLoading: scoresLoading } =
+  const { data: sentimentScores, isLoading: scoresLoading, error: scoresError } =
     trpc.sentiment.getDailyScores.useQuery({
       startDate,
       endDate,
     });
 
-  const { data: spaceWeatherData, isLoading: weatherLoading } =
+  const { data: spaceWeatherData, isLoading: weatherLoading, error: weatherError } =
     trpc.spaceWeather.getData.useQuery({
       startDate,
       endDate,
@@ -120,10 +120,30 @@ export default function Public() {
             <CardContent className="space-y-6">
               {isLoading ? (
                 <p className="text-sm text-muted-foreground">宇宙からの信号を解析中...</p>
+              ) : fortuneError ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-red-400 font-semibold">データ取得エラー</p>
+                  <p className="text-xs text-muted-foreground">
+                    APIサーバーに接続できませんでした。しばらくしてから再度お試しください。
+                  </p>
+                  <p className="text-[10px] text-muted-foreground/60 font-mono">
+                    {fortuneError.message || "Unknown error"}
+                  </p>
+                </div>
               ) : !prediction || !space ? (
-                <p className="text-sm text-muted-foreground">
-                  まだ十分なデータが集まっていません。少し時間をおいてから、もう一度アクセスしてみてください。
-                </p>
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    まだ十分なデータが集まっていません。
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    今日の宇宙天気データと推論モデルを準備中です。数時間後にもう一度アクセスしてみてください。
+                  </p>
+                  {space && !prediction && (
+                    <p className="text-xs text-yellow-400/80 mt-2">
+                      💡 ヒント: 推論モデルを学習するには、過去の集合意識データ（Hacker Newsの感情スコア）が必要です。
+                    </p>
+                  )}
+                </div>
               ) : (
                 <>
                   <div className="space-y-2">
@@ -169,7 +189,18 @@ export default function Public() {
         </section>
 
         {/* グラフ: 過去30日分の宇宙と集合意識の動き */}
-        {sentimentScores &&
+        {(scoresError || weatherError) && (
+          <section className="max-w-4xl mx-auto">
+            <Card className="border-yellow-500/30 bg-black/40">
+              <CardContent className="pt-6">
+                <p className="text-sm text-yellow-400/80">
+                  グラフデータの取得中にエラーが発生しました。メインの表示は正常に動作しています。
+                </p>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+        {!scoresError && !weatherError && sentimentScores &&
           sentimentScores.length > 0 &&
           spaceWeatherData &&
           spaceWeatherData.length > 0 && (
