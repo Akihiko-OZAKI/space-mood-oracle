@@ -245,53 +245,109 @@ export async function saveRealDataToDatabase(data: ProcessedSpaceWeatherData[]) 
   const { spaceWeatherData } = await import('../drizzle/schema');
   const { eq } = await import('drizzle-orm');
   
+  console.log('[SpaceWeather] saveRealDataToDatabase called with', data.length, 'items');
+  
   const db = await getDb();
   if (!db) {
     console.error('[SpaceWeather] Database not available in saveRealDataToDatabase');
     throw new Error('Database not available');
   }
 
+  console.log('[SpaceWeather] Database connection obtained, starting to save data');
+
   try {
+    // First, verify we can access the database and table
+    console.log('[SpaceWeather] ⭐ Starting table verification...');
+    try {
+      // Use raw query to check database and table
+      const { getDb: getDbRaw } = await import('./db');
+      const dbRaw = await getDbRaw();
+      if (dbRaw && '_driver' in dbRaw) {
+        // Access the underlying connection pool
+        const pool = (dbRaw as any)._driver?.pool || (dbRaw as any).pool;
+        if (pool) {
+          try {
+            const [dbNameResult] = await pool.query("SELECT DATABASE() as db_name") as any;
+            const currentDb = dbNameResult?.[0]?.db_name || "unknown";
+            console.log('[SpaceWeather] ⭐ Current database:', currentDb);
+            
+            const [tablesResult] = await pool.query("SHOW TABLES") as any;
+            const tables = Array.isArray(tablesResult) ? tablesResult.map((row: any) => Object.values(row)[0]).filter(Boolean) : [];
+            console.log('[SpaceWeather] ⭐ Available tables:', tables);
+            console.log('[SpaceWeather] ⭐ space_weather_data in tables?', tables.includes("space_weather_data"));
+          } catch (checkError: any) {
+            console.error('[SpaceWeather] ⭐ Failed to check database/tables:', checkError?.message);
+          }
+        }
+      }
+      
+      const testQuery = await db.select().from(spaceWeatherData).limit(0);
+      console.log('[SpaceWeather] ✅ Table space_weather_data exists and is accessible');
+    } catch (tableCheckError: any) {
+      console.error('[SpaceWeather] ❌ ERROR: Cannot access table space_weather_data');
+      console.error('[SpaceWeather] Table check error message:', tableCheckError?.message);
+      console.error('[SpaceWeather] Error code:', tableCheckError?.code);
+      console.error('[SpaceWeather] Error SQL state:', tableCheckError?.sqlState);
+      console.error('[SpaceWeather] Error SQL message:', tableCheckError?.sqlMessage);
+      throw tableCheckError;
+    }
+
     for (const item of data) {
+      console.log('[SpaceWeather] Processing date:', item.date);
       // Check if data already exists
       const existing = await db
         .select()
         .from(spaceWeatherData)
         .where(eq(spaceWeatherData.date, item.date))
         .limit(1);
+      
+      console.log('[SpaceWeather] Existing records for', item.date, ':', existing.length);
 
-      if (existing.length > 0) {
-        // Update existing record
-        await db
-          .update(spaceWeatherData)
-          .set({
+        if (existing.length > 0) {
+          // Update existing record
+          console.log(`[SpaceWeather] Updating existing record for ${item.date}`);
+          await db
+            .update(spaceWeatherData)
+            .set({
+              kpIndexMax: item.kpIndexMax.toFixed(2),
+              xClassFlareCount: item.xClassFlareCount,
+              mClassFlareCount: item.mClassFlareCount,
+              solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
+              protonFlux: item.protonFlux?.toFixed(2) || null,
+              solarRadiationScale: item.solarRadiationScale,
+              updatedAt: new Date(),
+            })
+            .where(eq(spaceWeatherData.date, item.date));
+          console.log(`[SpaceWeather] Successfully updated record for ${item.date}`);
+        } else {
+          // Insert new record
+          console.log(`[SpaceWeather] Inserting new record for ${item.date}`);
+          await db.insert(spaceWeatherData).values({
+            date: item.date,
             kpIndexMax: item.kpIndexMax.toFixed(2),
             xClassFlareCount: item.xClassFlareCount,
             mClassFlareCount: item.mClassFlareCount,
             solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
             protonFlux: item.protonFlux?.toFixed(2) || null,
             solarRadiationScale: item.solarRadiationScale,
-            updatedAt: new Date(),
-          })
-          .where(eq(spaceWeatherData.date, item.date));
-      } else {
-        // Insert new record
-        await db.insert(spaceWeatherData).values({
-          date: item.date,
-          kpIndexMax: item.kpIndexMax.toFixed(2),
-          xClassFlareCount: item.xClassFlareCount,
-          mClassFlareCount: item.mClassFlareCount,
-          solarWindSpeed: item.solarWindSpeed?.toFixed(2) || null,
-          protonFlux: item.protonFlux?.toFixed(2) || null,
-          solarRadiationScale: item.solarRadiationScale,
-        });
-      }
+          });
+          console.log(`[SpaceWeather] Successfully inserted record for ${item.date}`);
+        }
     }
 
     console.log(`✅ Saved ${data.length} days of real space weather data to database`);
-  } catch (error) {
+  } catch (error: any) {
     console.error('[SpaceWeather] Failed to save real space weather data to database');
-    console.error(error);
+    console.error('[SpaceWeather] Error type:', error?.constructor?.name || typeof error);
+    console.error('[SpaceWeather] Error message:', error?.message || 'No message');
+    console.error('[SpaceWeather] Error code:', error?.code);
+    console.error('[SpaceWeather] Error errno:', error?.errno);
+    console.error('[SpaceWeather] Error sqlState:', error?.sqlState);
+    console.error('[SpaceWeather] Error sqlMessage:', error?.sqlMessage);
+    console.error('[SpaceWeather] Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    if (error?.cause) {
+      console.error('[SpaceWeather] Error cause:', error.cause);
+    }
     throw error;
   }
 }

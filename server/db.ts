@@ -25,7 +25,10 @@ let _db: ReturnType<typeof drizzle> | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (_db) return _db;
+  if (_db) {
+    console.log("[Database] Using existing connection pool");
+    return _db;
+  }
 
   const urlStr = process.env.DATABASE_URL;
   if (!urlStr) {
@@ -43,6 +46,10 @@ export async function getDb() {
 
     const safeInfo = `${url.protocol}//${host}:${port}/${database ?? ""}`;
     console.log("[Database] Initializing MySQL pool with TLS to", safeInfo);
+    console.log("[Database] Database name:", database);
+    console.log("[Database] Host:", host);
+    console.log("[Database] Port:", port);
+    console.log("[Database] User:", user);
 
     const pool = await mysql.createPool({
       host,
@@ -58,9 +65,29 @@ export async function getDb() {
 
     _db = drizzle(pool);
     console.log("[Database] Connection object created successfully.");
+    console.log("[Database] Database connection pool ready for:", database || "(default)");
+    
+    // Test connection by querying database name and listing tables
+    try {
+      const [dbResult] = await pool.query("SELECT DATABASE() as db_name") as any;
+      const currentDb = dbResult?.[0]?.db_name || dbResult?.[0] || "unknown";
+      console.log("[Database] ⭐ Current database (from SELECT DATABASE()):", currentDb);
+      
+      // List tables in the current database
+      const [tablesResult] = await pool.query("SHOW TABLES") as any;
+      const tables = Array.isArray(tablesResult) ? tablesResult.map((row: any) => Object.values(row)[0]).filter(Boolean) : [];
+      console.log("[Database] ⭐ Tables in current database:", tables);
+      console.log("[Database] ⭐ space_weather_data exists?", tables.includes("space_weather_data"));
+      console.log("[Database] Available tables in database:", tables.length > 0 ? tables.join(", ") : "none");
+      console.log("[Database] Table count:", tables.length);
+    } catch (testError) {
+      console.warn("[Database] Failed to query current database:", testError);
+    }
+    
     return _db;
   } catch (error) {
-    console.warn("[Database] Failed to connect:", error);
+    console.error("[Database] Failed to connect:", error);
+    console.error("[Database] Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     _db = null;
     return null;
   }
