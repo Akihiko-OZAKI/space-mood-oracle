@@ -76,3 +76,4 @@ Add detailed database logging for debugging
 3. `[Database] ⭐ Current database (from SELECT DATABASE()):` が表示されることを確認
 4. `[Database] ⭐ Available tables in database:` が表示されることを確認
 
+
