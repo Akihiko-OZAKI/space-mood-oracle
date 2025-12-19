@@ -96,16 +96,12 @@ export default function Public() {
       </header>
 
       <main className="container mx-auto py-10 space-y-10">
-        <section className="max-w-3xl mx-auto text-center space-y-4">
-          <p className="text-sm tracking-[0.25em] text-purple-300/80">
-            COSMIC EXCUSE GENERATOR
-          </p>
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
+        <section className="max-w-3xl mx-auto text-center space-y-3">
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
             あなたの今日の不調は、宇宙のせいだ。
           </h2>
-          <p className="text-sm md:text-base text-muted-foreground">
-            過去の集合意識データと宇宙天気の相関から、
-            「もし人類の気分が宇宙だけで決まるとしたら、今日はどう見えるか？」を推定しています。
+          <p className="text-xs text-muted-foreground">
+            過去の集合意識データと宇宙天気の相関から、「もし人類の気分が宇宙だけで決まるとしたら、今日はどう見えるか？」を推定しています。
           </p>
         </section>
 
@@ -146,31 +142,37 @@ export default function Public() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <p className="text-lg font-semibold">{getScoreLabel()}</p>
-                    <p className="text-xs text-muted-foreground">
-                      推定スコア（-1〜1）: {predictedScore.toFixed(3)} / 信頼度:{" "}
-                      {confidence.toFixed(2)}
-                    </p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-xs text-muted-foreground/70 block mb-1">推定スコア（-1〜1）</span>
+                        <p className="text-base font-medium">{predictedScore.toFixed(3)}</p>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground/70 block mb-1">信頼度（0〜1）</span>
+                        <p className="text-base font-medium">{confidence.toFixed(2)}</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="p-4 rounded-lg bg-black/30 border border-purple-500/30 space-y-2 text-sm">
+                  <div className="p-4 rounded-lg bg-black/30 border border-purple-500/30 space-y-3 text-sm">
                     <div className="flex items-center gap-2 text-purple-200">
                       <Sun className="h-4 w-4" />
                       <span className="font-semibold">今日の宇宙天気</span>
                     </div>
-                    <div className="flex flex-wrap gap-4 text-xs md:text-sm text-muted-foreground mt-1">
-                      <div className="flex items-center gap-1">
-                        <Activity className="h-3 w-3 text-primary" />
-                        <span>Kp指数: {space.kpIndexMax ?? "N/A"}</span>
+                    <div className="grid grid-cols-3 gap-3 text-xs md:text-sm">
+                      <div>
+                        <span className="text-muted-foreground/70 block mb-1">地磁気活動（Kp指数）</span>
+                        <span className="font-medium">{space.kpIndexMax ?? "N/A"}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-red-400" />
-                        <span>Xクラスフレア: {xFlares}回</span>
+                      <div>
+                        <span className="text-muted-foreground/70 block mb-1">Xクラスフレア回数</span>
+                        <span className="font-medium">{xFlares}回</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <TrendingUp className="h-3 w-3 text-orange-400" />
-                        <span>Mクラスフレア: {mFlares}回</span>
+                      <div>
+                        <span className="text-muted-foreground/70 block mb-1">Mクラスフレア回数</span>
+                        <span className="font-medium">{mFlares}回</span>
                       </div>
                     </div>
                     <p className="text-xs md:text-sm text-muted-foreground mt-2 leading-relaxed">
@@ -224,9 +226,9 @@ export default function Public() {
                     />
                   )}
                   <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                    紫の線が日々の集合意識スコア（Hacker News のストーリータイトルを多言語感情辞書で分析）、
-                    緑やオレンジの棒が宇宙天気（Kp指数・太陽フレア）です。これらの関係性から、
-                    シンプルな相関モデルを学習し、今日の「宇宙だけから見た集合意識」を推定しています。
+                    <span className="font-medium text-foreground">紫の線（感情スコア）:</span> Hacker News のストーリータイトルを多言語感情辞書で分析した実際の集合意識スコア（-1〜1）。<br/>
+                    <span className="font-medium text-foreground">緑/オレンジの棒（宇宙天気）:</span> 地磁気活動（Kp指数、0〜9）と太陽フレア回数（X/Mクラス）。<br/>
+                    これらの過去データから推論モデルを学習し、<span className="font-medium text-primary">今日の「宇宙だけから見た集合意識」（上記の推定スコア）</span>を生成しています。
                   </p>
                 </CardContent>
               </Card>

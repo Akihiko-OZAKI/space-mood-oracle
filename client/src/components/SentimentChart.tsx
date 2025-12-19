@@ -163,51 +163,6 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
         </CardContent>
       </Card>
 
-      {/* Tweet Volume Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>投稿数トレンド</CardTitle>
-          <CardDescription>日次の分析対象投稿数</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="tweetGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="rgb(59, 130, 246)" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="rgb(59, 130, 246)" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="date" 
-                stroke="rgba(255,255,255,0.5)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
-              />
-              <YAxis 
-                stroke="rgba(255,255,255,0.5)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  border: '1px solid rgba(59, 130, 246, 0.3)',
-                  borderRadius: '8px',
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.9)' }}
-              />
-              <Area
-                type="monotone"
-                dataKey="tweetCount"
-                stroke="rgb(59, 130, 246)"
-                strokeWidth={2}
-                fill="url(#tweetGradient)"
-                name="投稿数"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
     </div>
   );
 }
