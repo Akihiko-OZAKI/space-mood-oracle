@@ -276,6 +276,102 @@ export const appRouter = router({
           getLatestPredictionByDate(today),
         ]);
         
+        // データが不足している場合、自動的に取得・更新を実行（非同期、エラーは無視）
+        if (!spaceWeather || !prediction) {
+          // 非同期で実行（レスポンスをブロックしない）
+          (async () => {
+            try {
+              // 今日の宇宙天気データが不足している場合、取得を試みる
+              if (!spaceWeather) {
+                console.log('[Oracle] Auto-fetching today\'s space weather data...');
+                const { fetchRealSpaceWeatherData, saveRealDataToDatabase } = await import('./realSpaceWeather');
+                const endDate = new Date();
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() - 30); // Last 30 days
+                const data = await fetchRealSpaceWeatherData(startDate, endDate);
+                await saveRealDataToDatabase(data);
+                console.log('[Oracle] Auto-fetched space weather data:', data.length, 'days');
+              }
+              
+              // 予測が不足している場合、モデルを学習して予測を生成
+              if (!prediction) {
+                console.log('[Oracle] Auto-training prediction model...');
+                const { getSpaceWeatherDataByDate, getDailySentimentScores, getSpaceWeatherData, insertPrediction } = await import('./db');
+                const { predictSentiment } = await import('./prediction');
+                const todaySpaceWeather = await getSpaceWeatherDataByDate(today);
+                
+                if (todaySpaceWeather) {
+                  // 過去90日分のデータで学習
+                  const days = 90;
+                  const start = new Date(today);
+                  start.setDate(start.getDate() - (days - 1));
+                  const startDate = start.toISOString().split('T')[0];
+                  
+                  // Load historical data
+                  const [sentiments, spaceWeatherHistory] = await Promise.all([
+                    getDailySentimentScores(startDate, today),
+                    getSpaceWeatherData(startDate, today),
+                  ]);
+                  
+                  // Join by date
+                  const spaceByDate = new Map<string, any>(
+                    spaceWeatherHistory.map((sw: any) => [sw.date, sw]),
+                  );
+                  
+                  const trainingData = sentiments
+                    .map((s: any) => {
+                      const sw = spaceByDate.get(s.date);
+                      if (!sw) return null;
+                      
+                      const sentimentScore = parseFloat(s.score ?? '0');
+                      const kpIndexMax = parseFloat(sw.kpIndexMax ?? '0');
+                      const xClassFlareCount = sw.xClassFlareCount ?? 0;
+                      const mClassFlareCount = sw.mClassFlareCount ?? 0;
+                      
+                      if (Number.isNaN(sentimentScore) || Number.isNaN(kpIndexMax)) {
+                        return null;
+                      }
+                      
+                      return {
+                        date: s.date,
+                        sentimentScore,
+                        kpIndexMax,
+                        xClassFlareCount,
+                        mClassFlareCount,
+                      };
+                    })
+                    .filter((x: any) => x !== null);
+                  
+                  if (trainingData.length >= 5) {
+                    const spaceInput = {
+                      kpIndexMax: parseFloat(todaySpaceWeather.kpIndexMax ?? '0'),
+                      xClassFlareCount: todaySpaceWeather.xClassFlareCount ?? 0,
+                      mClassFlareCount: todaySpaceWeather.mClassFlareCount ?? 0,
+                    };
+                    
+                    const predResult = predictSentiment(trainingData as any, spaceInput);
+                    
+                    await insertPrediction({
+                      date: today,
+                      predictedScore: predResult.predictedScore.toFixed(6),
+                      confidence: predResult.confidence.toFixed(6),
+                      modelVersion: 'simple-correlation-v1',
+                    });
+                    
+                    console.log('[Oracle] Auto-generated prediction for today');
+                  } else {
+                    console.warn('[Oracle] Not enough training data for auto-prediction:', trainingData.length);
+                  }
+                } else {
+                  console.warn('[Oracle] Cannot auto-train: today\'s space weather data is missing');
+                }
+              }
+            } catch (error) {
+              console.error('[Oracle] Auto-fetch/train error:', error);
+            }
+          })();
+        }
+        
         return {
           date: today,
           sentiment,

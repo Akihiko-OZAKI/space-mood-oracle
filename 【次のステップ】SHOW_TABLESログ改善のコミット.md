@@ -122,3 +122,4 @@ Starting database introspection
 
 **まず、変更をコミット・プッシュして、再デプロイ後に「実データ取得」を実行してください！** 🚀
 
+

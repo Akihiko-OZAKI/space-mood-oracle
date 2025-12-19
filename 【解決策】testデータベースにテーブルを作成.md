@@ -78,3 +78,4 @@ CREATE TABLE IF NOT EXISTS space_weather_data (
 
 **まず、TiDB Cloudで `test` データベースにテーブルが存在するか確認してください！** 🔍
 
+

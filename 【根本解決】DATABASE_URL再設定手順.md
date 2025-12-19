@@ -88,3 +88,4 @@
 
 **まず、TiDB Cloudで接続文字列を再生成して、Renderの `DATABASE_URL` を更新してください！** 🔧
 
+

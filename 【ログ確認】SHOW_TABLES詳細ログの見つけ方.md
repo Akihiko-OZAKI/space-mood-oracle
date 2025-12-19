@@ -96,3 +96,4 @@ SHOW TABLES raw result
 
 **まず、ログをスクロールして、`SHOW TABLES raw result` のログを探してください！** 🔍
 
+

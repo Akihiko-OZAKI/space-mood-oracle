@@ -77,3 +77,4 @@ Add detailed database logging for debugging
 4. `[Database] ⭐ Available tables in database:` が表示されることを確認
 
 
+

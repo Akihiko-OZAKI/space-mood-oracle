@@ -144,3 +144,4 @@ Pool found, querying database
 
 **デプロイ完了後、上記の手順で確認してください！特に `SHOW TABLES raw result` の内容を確認すると、問題の原因が分かります。** 🔍
 
+

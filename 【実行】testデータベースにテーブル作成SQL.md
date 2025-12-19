@@ -135,3 +135,4 @@ SHOW TABLES;
 
 **まず、TiDB Cloudで上記のSQLを実行してください！** 🚀
 
+
