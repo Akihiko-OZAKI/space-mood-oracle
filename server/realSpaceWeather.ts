@@ -128,6 +128,9 @@ export async function fetchRealSpaceWeatherData(
       fetchProtonFlux(),
     ]);
 
+    console.log(`[SpaceWeather] Fetched data counts - Flares: ${flares.length}, Kp: ${kpData.length}, Proton: ${protonData.length}`);
+    console.log(`[SpaceWeather] Date range: ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`);
+
     // Group data by date
     const dataByDate = new Map<string, ProcessedSpaceWeatherData>();
 
@@ -165,16 +168,23 @@ export async function fetchRealSpaceWeatherData(
 
     // Process Kp index data (aggregate by day)
     const kpByDate = new Map<string, number[]>();
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
     
     for (const kp of kpData) {
       const dateStr = kp.time_tag.split('T')[0];
       
-      if (!kpByDate.has(dateStr)) {
-        kpByDate.set(dateStr, []);
+      // Only process data within the requested date range
+      if (dateStr >= startDateStr && dateStr <= endDateStr) {
+        if (!kpByDate.has(dateStr)) {
+          kpByDate.set(dateStr, []);
+        }
+        
+        kpByDate.get(dateStr)!.push(kp.estimated_kp);
       }
-      
-      kpByDate.get(dateStr)!.push(kp.estimated_kp);
     }
+
+    console.log(`[SpaceWeather] Kp data grouped by date: ${kpByDate.size} days with data`);
 
     // Calculate daily Kp statistics
     for (const [dateStr, kpValues] of Array.from(kpByDate.entries())) {
@@ -182,24 +192,36 @@ export async function fetchRealSpaceWeatherData(
       
       if (data && kpValues.length > 0) {
         data.kpIndexMax = Math.max(...kpValues);
+        console.log(`[SpaceWeather] Kp for ${dateStr}: max=${data.kpIndexMax.toFixed(2)} (from ${kpValues.length} values)`);
       }
     }
 
     // Process proton flux data (>=10 MeV for S-scale)
     const protonByDate = new Map<string, number[]>();
+    const protonEnergyCounts: Record<string, number> = {};
     
     for (const proton of protonData) {
+      // Count different energy levels for debugging
+      const energy = proton.energy || 'unknown';
+      protonEnergyCounts[energy] = (protonEnergyCounts[energy] || 0) + 1;
+      
       // Only use >=10 MeV data for S-scale calculation
       if (proton.energy === '>=10 MeV') {
         const dateStr = proton.time_tag.split('T')[0];
         
-        if (!protonByDate.has(dateStr)) {
-          protonByDate.set(dateStr, []);
+        // Only process data within the requested date range
+        if (dateStr >= startDateStr && dateStr <= endDateStr) {
+          if (!protonByDate.has(dateStr)) {
+            protonByDate.set(dateStr, []);
+          }
+          
+          protonByDate.get(dateStr)!.push(proton.flux);
         }
-        
-        protonByDate.get(dateStr)!.push(proton.flux);
       }
     }
+
+    console.log(`[SpaceWeather] Proton flux energy levels:`, protonEnergyCounts);
+    console.log(`[SpaceWeather] Proton flux (>=10 MeV) grouped by date: ${protonByDate.size} days with data`);
 
     // Calculate daily proton flux max and S-scale
     for (const [dateStr, fluxValues] of Array.from(protonByDate.entries())) {
@@ -209,6 +231,7 @@ export async function fetchRealSpaceWeatherData(
         const maxFlux = Math.max(...fluxValues);
         data.protonFlux = maxFlux;
         data.solarRadiationScale = calculateSScale(maxFlux);
+        console.log(`[SpaceWeather] Proton flux for ${dateStr}: max=${maxFlux.toFixed(2)} pfu, S-scale=${data.solarRadiationScale} (from ${fluxValues.length} values)`);
       }
     }
 
