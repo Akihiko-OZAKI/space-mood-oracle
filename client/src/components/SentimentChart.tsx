@@ -51,10 +51,9 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
   const maxFlares = Math.max(...chartData.map(d => d.flares || 0), 1);
   const maxProtonFlux = Math.max(...chartData.map(d => d.protonFlux || 0), 100);
 
-  return (
-    <div className="space-y-6">
-      {/* グラフ1: Kp指数と感情スコアの相関 */}
-      <Card>
+  // 個別のグラフ要素を返す（グリッドレイアウト用）
+  const kpChart = (
+    <Card key="kp-chart">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity className="h-5 w-5 text-yellow-400" />
@@ -134,9 +133,10 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
           </ResponsiveContainer>
         </CardContent>
       </Card>
+  );
 
-      {/* グラフ2: 太陽フレアと感情スコアの相関 */}
-      <Card>
+  const flareChart = (
+    <Card key="flare-chart">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Sun className="h-5 w-5 text-orange-400" />
@@ -206,9 +206,10 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
           </ResponsiveContainer>
         </CardContent>
       </Card>
+  );
 
-      {/* グラフ3: プロトンフラックスと感情スコアの相関 */}
-      <Card>
+  const protonChart = (
+    <Card key="proton-chart">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Zap className="h-5 w-5 text-blue-400" />
@@ -288,6 +289,13 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
           </ResponsiveContainer>
         </CardContent>
       </Card>
-    </div>
+  );
+
+  return (
+    <>
+      {kpChart}
+      {flareChart}
+      {protonChart}
+    </>
   );
 }

@@ -105,15 +105,22 @@ export default function Public() {
           </p>
         </section>
 
-        <section className="max-w-3xl mx-auto">
-          <Card className="border-primary/30 bg-gradient-to-br from-black/60 via-purple-950/60 to-blue-950/60">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
-                宇宙だけから見た今日の集合意識
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
+        {/* サマリーとグラフのタイルレイアウト */}
+        {!scoresError && !weatherError && sentimentScores &&
+          sentimentScores.length > 0 &&
+          spaceWeatherData &&
+          spaceWeatherData.length > 0 && !scoresLoading && !weatherLoading && (
+            <section className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* サマリーカード（左側または上側） */}
+                <Card className="border-primary/30 bg-gradient-to-br from-black/60 via-purple-950/60 to-blue-950/60">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Sparkles className="h-5 w-5 text-primary" />
+                      宇宙だけから見た今日の集合意識
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                   <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -193,11 +200,30 @@ export default function Public() {
                   </p>
                 </>
               )}
-            </CardContent>
-          </Card>
-        </section>
+                  </CardContent>
+                </Card>
 
-        {/* グラフ: 過去30日分の宇宙と集合意識の動き */}
+                {/* グラフエリア（右側または下側） */}
+                <div className="space-y-6">
+                  <SentimentChart
+                    sentimentData={sentimentScores}
+                    spaceWeatherData={spaceWeatherData}
+                  />
+                </div>
+              </div>
+              
+              {/* 説明文 */}
+              <div className="mt-6 max-w-4xl mx-auto">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  <span className="font-medium text-foreground">紫の線（感情スコア）:</span> Hacker News のストーリータイトルを多言語感情辞書で分析した実際の集合意識スコア（-1〜1）。<br/>
+                  <span className="font-medium text-foreground">各グラフの指標:</span> 地磁気活動（Kp指数、0〜9）、太陽フレア回数（X/Mクラス）、プロトンフラックス（高エネルギー陽子フラックス、{">="}10 MeV）。<br/>
+                  これらの過去データから推論モデルを学習し、<span className="font-medium text-primary">今日の「宇宙だけから見た集合意識」（上記の推定スコア）</span>を生成しています。
+                </p>
+              </div>
+            </section>
+          )}
+
+        {/* エラー表示 */}
         {(scoresError || weatherError) && (
           <section className="max-w-4xl mx-auto">
             <Card className="border-yellow-500/30 bg-black/40">
@@ -209,38 +235,101 @@ export default function Public() {
             </Card>
           </section>
         )}
-        {!scoresError && !weatherError && sentimentScores &&
-          sentimentScores.length > 0 &&
-          spaceWeatherData &&
-          spaceWeatherData.length > 0 && (
-            <section className="max-w-4xl mx-auto">
-              <Card className="border-purple-500/30 bg-black/40">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    過去30日間の「宇宙」と「集合意識」
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {scoresLoading || weatherLoading ? (
-                    <p className="text-sm text-muted-foreground">
-                      データを読み込み中です...
+
+        {/* ローディングまたはデータなしの場合のサマリー表示 */}
+        {((scoresLoading || weatherLoading) || !sentimentScores || sentimentScores.length === 0 || !spaceWeatherData || spaceWeatherData.length === 0) && (
+          <section className="max-w-3xl mx-auto">
+            <Card className="border-primary/30 bg-gradient-to-br from-black/60 via-purple-950/60 to-blue-950/60">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" />
+                  宇宙だけから見た今日の集合意識
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {isLoading ? (
+                  <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                    <p className="text-lg font-semibold text-purple-300">宇宙からの信号を解析中...</p>
+                    <p className="text-sm text-muted-foreground">しばらくお待ちください</p>
+                  </div>
+                ) : fortuneError ? (
+                  <div className="space-y-2">
+                    <p className="text-sm text-red-400 font-semibold">データ取得エラー</p>
+                    <p className="text-xs text-muted-foreground">
+                      APIサーバーに接続できませんでした。しばらくしてから再度お試しください。
                     </p>
-                  ) : (
-                    <SentimentChart
-                      sentimentData={sentimentScores}
-                      spaceWeatherData={spaceWeatherData}
-                    />
-                  )}
-                  <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
-                    <span className="font-medium text-foreground">紫の線（感情スコア）:</span> Hacker News のストーリータイトルを多言語感情辞書で分析した実際の集合意識スコア（-1〜1）。<br/>
-                    <span className="font-medium text-foreground">各グラフの指標:</span> 地磁気活動（Kp指数、0〜9）、太陽フレア回数（X/Mクラス）、プロトンフラックス（高エネルギー陽子フラックス、{">="}10 MeV）。<br/>
-                    これらの過去データから推論モデルを学習し、<span className="font-medium text-primary">今日の「宇宙だけから見た集合意識」（上記の推定スコア）</span>を生成しています。
-                  </p>
-                </CardContent>
-              </Card>
-            </section>
-          )}
+                    <p className="text-[10px] text-muted-foreground/60 font-mono">
+                      {fortuneError.message || "Unknown error"}
+                    </p>
+                  </div>
+                ) : !prediction || !space ? (
+                  <div className="space-y-3 py-6">
+                    <div className="flex items-center gap-3">
+                      <div className="animate-pulse rounded-full h-3 w-3 bg-yellow-500"></div>
+                      <p className="text-base font-semibold text-yellow-400">
+                        データを準備中です...
+                      </p>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      今日の宇宙天気データと推論モデルを自動取得しています。数秒後にページを再読み込みしてください。
+                    </p>
+                    {space && !prediction && (
+                      <p className="text-xs text-yellow-400/80 mt-2">
+                        💡 ヒント: 推論モデルの学習には、過去の集合意識データ（Hacker Newsの感情スコア）が必要です。
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-3">
+                      <p className="text-lg font-semibold">{getScoreLabel()}</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-xs text-muted-foreground/70 block mb-1">推定スコア（-1〜1）</span>
+                          <p className="text-base font-medium">{predictedScore.toFixed(3)}</p>
+                        </div>
+                        <div>
+                          <span className="text-xs text-muted-foreground/70 block mb-1">信頼度（0〜1）</span>
+                          <p className="text-base font-medium">{confidence.toFixed(2)}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-black/30 border border-purple-500/30 space-y-3 text-sm">
+                      <div className="flex items-center gap-2 text-purple-200">
+                        <Sun className="h-4 w-4" />
+                        <span className="font-semibold">今日の宇宙天気</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 text-xs md:text-sm">
+                        <div>
+                          <span className="text-muted-foreground/70 block mb-1">地磁気活動（Kp指数）</span>
+                          <span className="font-medium">{space.kpIndexMax ?? "N/A"}</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground/70 block mb-1">Xクラスフレア回数</span>
+                          <span className="font-medium">{xFlares}回</span>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground/70 block mb-1">Mクラスフレア回数</span>
+                          <span className="font-medium">{mFlares}回</span>
+                        </div>
+                      </div>
+                      <p className="text-xs md:text-sm text-muted-foreground mt-2 leading-relaxed">
+                        {getCosmicImpactText()}
+                      </p>
+                    </div>
+
+                    <p className="text-[11px] text-muted-foreground">
+                      ※ このサイトは医療・投資などの意思決定を目的としたものではありません。
+                      「今日は宇宙のコンディションが悪いから、少し自分に甘くしてもいいかも」と思える口実としてお使いください。
+                    </p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        )}
 
         {/* サイトとモデルの説明 */}
         <section className="max-w-3xl mx-auto">
