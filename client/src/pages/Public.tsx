@@ -1,7 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SentimentChart } from "@/components/SentimentChart";
-import { Sparkles, Sun, Activity, TrendingUp, Calendar } from "lucide-react";
+import { Sparkles, Sun } from "lucide-react";
 
 export default function Public() {
   const { data: todayFortune, isLoading, error: fortuneError } = trpc.oracle.getTodayFortune.useQuery();
@@ -70,31 +70,6 @@ export default function Public() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-blue-900 text-white">
-      <header className="border-b border-purple-500/30 bg-black/40 backdrop-blur-sm sticky top-0 z-40">
-        <div className="container mx-auto py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Sparkles className="h-7 w-7 text-primary animate-pulse" />
-            <div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 bg-clip-text text-transparent">
-                宇宙の意思 – Cosmic Mood Today
-              </h1>
-              <p className="text-xs text-muted-foreground">
-                太陽と地磁気のデータだけから、人類の「今日の気分」を読む実験サイト
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
-            {new Date().toLocaleDateString("ja-JP", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-              weekday: "short",
-            })}
-          </div>
-        </div>
-      </header>
-
       <main className="container mx-auto py-10 space-y-10">
         <section className="max-w-3xl mx-auto text-center space-y-3">
           <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
