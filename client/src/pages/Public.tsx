@@ -234,7 +234,7 @@ export default function Public() {
                   )}
                   <p className="mt-3 text-xs text-muted-foreground leading-relaxed">
                     <span className="font-medium text-foreground">紫の線（感情スコア）:</span> Hacker News のストーリータイトルを多言語感情辞書で分析した実際の集合意識スコア（-1〜1）。<br/>
-                    <span className="font-medium text-foreground">緑/オレンジの棒（宇宙天気）:</span> 地磁気活動（Kp指数、0〜9）と太陽フレア回数（X/Mクラス）。<br/>
+                    <span className="font-medium text-foreground">各グラフの指標:</span> 地磁気活動（Kp指数、0〜9）、太陽フレア回数（X/Mクラス）、プロトンフラックス（高エネルギー陽子フラックス、>=10 MeV）。<br/>
                     これらの過去データから推論モデルを学習し、<span className="font-medium text-primary">今日の「宇宙だけから見た集合意識」（上記の推定スコア）</span>を生成しています。
                   </p>
                 </CardContent>
