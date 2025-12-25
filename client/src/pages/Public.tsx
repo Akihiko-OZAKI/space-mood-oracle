@@ -196,7 +196,7 @@ export default function Public() {
                         <ul className="list-disc list-inside space-y-2">
                           <li>
                             <span className="font-medium text-foreground">地磁気活動（Kp指数）:</span>{" "}
-                            NOAA Space Weather Prediction Center が提供する 1分ごとの planetary K-index から、
+                            NOAA Space Weather Prediction Center（北米宇宙天気予報センター）が提供する 1分ごとの planetary K-index から、
                             その日の最大値を指標として使用しています。Kp は 0〜9 のスケールで、値が大きいほど
                             地球の磁場の乱れが強く、5 以上になると地磁気嵐レベルとみなされます。
                           </li>
