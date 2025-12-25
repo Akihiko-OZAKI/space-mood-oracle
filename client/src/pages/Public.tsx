@@ -115,7 +115,11 @@ export default function Public() {
             </CardHeader>
             <CardContent className="space-y-6">
               {isLoading ? (
-                <p className="text-sm text-muted-foreground">宇宙からの信号を解析中...</p>
+                <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                  <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+                  <p className="text-lg font-semibold text-purple-300">宇宙からの信号を解析中...</p>
+                  <p className="text-sm text-muted-foreground">しばらくお待ちください</p>
+                </div>
               ) : fortuneError ? (
                 <div className="space-y-2">
                   <p className="text-sm text-red-400 font-semibold">データ取得エラー</p>
@@ -127,16 +131,19 @@ export default function Public() {
                   </p>
                 </div>
               ) : !prediction || !space ? (
-                <div className="space-y-2">
+                <div className="space-y-3 py-6">
+                  <div className="flex items-center gap-3">
+                    <div className="animate-pulse rounded-full h-3 w-3 bg-yellow-500"></div>
+                    <p className="text-base font-semibold text-yellow-400">
+                      データを準備中です...
+                    </p>
+                  </div>
                   <p className="text-sm text-muted-foreground">
-                    まだ十分なデータが集まっていません。
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    今日の宇宙天気データと推論モデルを準備中です。数時間後にもう一度アクセスしてみてください。
+                    今日の宇宙天気データと推論モデルを自動取得しています。数秒後にページを再読み込みしてください。
                   </p>
                   {space && !prediction && (
                     <p className="text-xs text-yellow-400/80 mt-2">
-                      💡 ヒント: 推論モデルを学習するには、過去の集合意識データ（Hacker Newsの感情スコア）が必要です。
+                      💡 ヒント: 推論モデルの学習には、過去の集合意識データ（Hacker Newsの感情スコア）が必要です。
                     </p>
                   )}
                 </div>

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Area, AreaChart, ComposedChart, Bar } from "recharts";
-import { Activity, Sun } from "lucide-react";
+import { Sun } from "lucide-react";
 
 interface SentimentDataPoint {
   date: string;
@@ -36,56 +36,6 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
 
   return (
     <div className="space-y-6">
-      {/* Sentiment Trend Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5 text-primary" />
-            感情スコアトレンド（過去30日）
-          </CardTitle>
-          <CardDescription>集合感情の時系列変化</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={chartData}>
-              <defs>
-                <linearGradient id="sentimentGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="rgb(168, 85, 247)" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="rgb(168, 85, 247)" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-              <XAxis 
-                dataKey="date" 
-                stroke="rgba(255,255,255,0.5)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
-              />
-              <YAxis 
-                domain={[-1, 1]}
-                stroke="rgba(255,255,255,0.5)"
-                tick={{ fill: 'rgba(255,255,255,0.7)' }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: 'rgba(0,0,0,0.8)',
-                  border: '1px solid rgba(168, 85, 247, 0.3)',
-                  borderRadius: '8px',
-                }}
-                labelStyle={{ color: 'rgba(255,255,255,0.9)' }}
-              />
-              <Area
-                type="monotone"
-                dataKey="sentiment"
-                stroke="rgb(168, 85, 247)"
-                strokeWidth={2}
-                fill="url(#sentimentGradient)"
-                name="感情スコア"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
       {/* Correlation Chart */}
       <Card>
         <CardHeader>

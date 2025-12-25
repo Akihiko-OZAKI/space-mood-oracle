@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Mood Today - プレゼン資料</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #16213e 100%);
+            color: #fff;
+            padding: 40px;
+            min-height: 100vh;
+            overflow-x: auto;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            padding: 60px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(147, 51, 234, 0.3);
+            position: relative;
+        }
+        
+        /* 手書き風の装飾 */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px dashed rgba(147, 51, 234, 0.5);
+            border-radius: 35px;
+            animation: dashRotate 20s linear infinite;
+        }
+        
+        @keyframes dashRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        h1 {
+            font-family: 'Kalam', cursive;
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #a855f7, #ec4899, #3b82f6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+            transform: rotate(-2deg);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .keypoint {
+            text-align: center;
+            font-size: 32px;
+            font-weight: 700;
+            color: #fbbf24;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(251, 191, 36, 0.1);
+            border-radius: 20px;
+            border: 3px solid #fbbf24;
+            transform: rotate(1deg);
+            box-shadow: 0 10px 30px rgba(251, 191, 36, 0.3);
+            font-family: 'Kalam', cursive;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 25px;
+            padding: 30px;
+            border: 2px solid rgba(147, 51, 234, 0.4);
+            position: relative;
+            transform: rotate(-0.5deg);
+            transition: transform 0.3s;
+        }
+        
+        .section:nth-child(even) {
+            transform: rotate(0.5deg);
+        }
+        
+        .section:hover {
+            transform: rotate(0deg) scale(1.02);
+            box-shadow: 0 15px 40px rgba(147, 51, 234, 0.4);
+        }
+        
+        .section-title {
+            font-family: 'Kalam', cursive;
+            font-size: 28px;
+            color: #a855f7;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px dashed rgba(168, 85, 247, 0.5);
+            padding-bottom: 10px;
+        }
+        
+        .data-source {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 5px solid #3b82f6;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            transform: rotate(-0.3deg);
+        }
+        
+        .data-source:nth-child(even) {
+            transform: rotate(0.3deg);
+            background: rgba(236, 72, 153, 0.15);
+            border-left-color: #ec4899;
+        }
+        
+        .data-source-title {
+            font-weight: 700;
+            font-size: 18px;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+        
+        .data-source-content {
+            font-size: 14px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        
+        .architecture {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+        
+        .flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .flow-item {
+            background: rgba(168, 85, 247, 0.2);
+            border: 3px solid #a855f7;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            min-width: 200px;
+            flex: 1;
+            position: relative;
+            transform: rotate(-1deg);
+        }
+        
+        .flow-item:nth-child(2) {
+            transform: rotate(1deg);
+        }
+        
+        .flow-item:nth-child(3) {
+            transform: rotate(-0.5deg);
+        }
+        
+        .flow-item-title {
+            font-family: 'Kalam', cursive;
+            font-size: 24px;
+            color: #c084fc;
+            margin-bottom: 10px;
+        }
+        
+        .flow-item-desc {
+            font-size: 14px;
+            color: #e9d5ff;
+        }
+        
+        .arrow {
+            font-size: 40px;
+            color: #a855f7;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .emoji {
+            font-size: 40px;
+            display: inline-block;
+            margin: 0 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        .note {
+            background: rgba(251, 191, 36, 0.1);
+            border: 2px dashed #fbbf24;
+            border-radius: 15px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #fde68a;
+            transform: rotate(0.5deg);
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            .container {
+                background: white;
+                border: 2px solid #000;
+            }
+            .section {
+                background: #f9fafb;
+                border: 2px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌌 Cosmic Mood Today 🌌</h1>
+        
+        <div class="keypoint">
+            「あなたの今日の不調は、宇宙のせいだ。」
+        </div>
+        
+        <div class="grid">
+            <div class="section">
+                <div class="section-title">🌍 宇宙天気データ</div>
+                <div class="data-source">
+                    <div class="data-source-title">📡 NOAA Space Weather Prediction Center</div>
+                    <div class="data-source-content">
+                        <strong>正式名称:</strong> National Oceanic and Atmospheric Administration（米国海洋大気庁）<br>
+                        <strong>機関:</strong> 米国商務省の下にある連邦政府機関<br>
+                        <strong>信頼性:</strong> 世界標準の宇宙天気データを提供する公式機関<br>
+                        <strong>URL:</strong> https://services.swpc.noaa.gov/json<br>
+                        <strong>認証:</strong> 不要（完全無料、オープンデータ）<br>
+                        <strong>データ内容:</strong><br>
+                        • Kp指数（地磁気活動: 0〜9）<br>
+                        • 太陽フレア（Xクラス、Mクラス）<br>
+                        • プロトンフラックス<br>
+                        • 太陽風速度
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">💭 集合意識データ</div>
+                <div class="data-source">
+                    <div class="data-source-title">📰 Hacker News Algolia API</div>
+                    <div class="data-source-content">
+                        <strong>URL:</strong> http://hn.algolia.com/api/v1/search_by_date<br>
+                        <strong>認証:</strong> 不要（APIキー不要）<br>
+                        <strong>データ内容:</strong><br>
+                        • ストーリータイトル（1日500件）<br>
+                        • 多言語感情辞書で分析<br>
+                        • 集合意識スコア（-1〜1）<br>
+                        • 過去90日分で学習
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section architecture">
+                <div class="section-title">🏗️ システムアーキテクチャ</div>
+                <div class="flow">
+                    <div class="flow-item">
+                        <div class="flow-item-title">📦 GitHub</div>
+                        <div class="flow-item-desc">
+                            コードリポジトリ<br>
+                            <span style="font-size: 12px; color: #94a3b8;">mainブランチにpush</span>
+                        </div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-item-title">⚙️ Render</div>
+                        <div class="flow-item-desc">
+                            バックエンドAPI<br>
+                            <span style="font-size: 12px; color: #94a3b8;">Node.js / tRPC<br>自動デプロイ</span>
+                        </div>
+                    </div>
+                    <div class="arrow">→</div>
+                    <div class="flow-item">
+                        <div class="flow-item-title">✨ Vercel</div>
+                        <div class="flow-item-desc">
+                            フロントエンド<br>
+                            <span style="font-size: 12px; color: #94a3b8;">React / Vite<br>自動デプロイ</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="note">
+                    💡 <strong>自動デプロイ:</strong> GitHubにpushすると、RenderとVercelが自動的に最新コードをデプロイします
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; font-size: 18px; color: #c084fc;">
+            <span class="emoji">🚀</span>
+            過去のデータから推論モデルを学習し、<br>
+            今日の「宇宙だけから見た集合意識」を推定
+            <span class="emoji">🌙</span>
+        </div>
+    </div>
+</body>
+</html>
