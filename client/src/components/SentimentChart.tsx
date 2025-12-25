@@ -214,7 +214,7 @@ export function SentimentChart({ sentimentData, spaceWeatherData }: SentimentCha
             <Zap className="h-5 w-5 text-blue-400" />
             プロトンフラックスと感情スコア
           </CardTitle>
-          <CardDescription>過去30日間の高エネルギー陽子フラックス（>=10 MeV）と集合意識の相関</CardDescription>
+          <CardDescription>過去30日間の高エネルギー陽子フラックス（{">="}10 MeV）と集合意識の相関</CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
